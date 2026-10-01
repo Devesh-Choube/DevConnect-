@@ -8,10 +8,10 @@ import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 
-@Component
+@Service
 @RequiredArgsConstructor
 public class CurrentUserService {
     private final UserRepo userRepo;
@@ -19,7 +19,13 @@ public class CurrentUserService {
 
     private PrincipalUserDetails getPrincipal() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return (PrincipalUserDetails) authentication.getPrincipal();
+
+        if (authentication == null ||
+                !(authentication.getPrincipal() instanceof PrincipalUserDetails principal)) {
+            throw new UnauthorizedUserException("User is not authenticated");
+        }
+
+        return principal;
     }
 
     public User getCurrentUser() {

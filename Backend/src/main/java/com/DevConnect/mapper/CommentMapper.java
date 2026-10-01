@@ -24,7 +24,9 @@ public class CommentMapper {
         Long upVotes = comment.getCommentVotes().stream().filter(v->v.getVoteType()== VoteType.UPVOTE).count();
         Long downVotes = comment.getCommentVotes().stream().filter(v->v.getVoteType()==VoteType.DOWNVOTE).count();
         return new CommentResponse(comment.getCommentId(),
-                comment.getUser().getUsername(),
+                comment.getUser().isDeleted()
+                        ? "Anonymous"
+                        : comment.getUser().getUsername(),
                 comment.getContent(),
                 comment.getCreatedAt(),
                 comment.getUpdatedAt(),

@@ -19,8 +19,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.Set;
 
@@ -43,11 +43,10 @@ public class PostService {
 
 
 
+    @Transactional
     public PostResponse createPost(CreatePostRequest postRequest) {
 
         Post post = postMapper.toEntity(postRequest);
-        post.setCreatedAt(LocalDateTime.now());
-        post.setUpdatedAt(LocalDateTime.now());
         User user = currentUserService.getCurrentUser();
         post.setUser(user);
         postRepo.save(post);
@@ -55,17 +54,18 @@ public class PostService {
 
     }
 
+    @Transactional
     public PostResponse updatePost(UpdatePostRequest updatePostRequest, Integer id) {
         Post post = postRepo.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Post Not Found")
         );
         currentUserService.validateOwnership(post.getUser().getUserId());
         postMapper.updateEntity(updatePostRequest, post);
-        post.setUpdatedAt(LocalDateTime.now());
         postRepo.save(post);
         return postMapper.toResponse(post);
     }
 
+    @Transactional
     public String deletePost(Integer id) {
         Post post = postRepo.findById(id).orElseThrow(
                 () -> new EntityNotFoundException("Post Not Found")
@@ -76,6 +76,7 @@ public class PostService {
     }
 
 
+    @Transactional
     public String votePost(Integer id, VoteRequest voteRequest) {
         Post post = postRepo.findById(id).orElseThrow(() -> new EntityNotFoundException("Post Not Found"));
         User user = currentUserService.getCurrentUser();
@@ -112,16 +113,29 @@ public class PostService {
         return allPosts.map(postMapper::toResponse);
     }
 
-    public Page<PostResponse> searchPosts(String keyword, int page, int size, String sortBy, Sort.Direction direction) {
-       validateSortField(sortBy);
-        Pageable pageable = PageRequest.of(page,size, Sort.by(direction,sortBy));
-        keyword=keyword.trim();
+    public Page<PostResponse> searchPosts(
+            String keyword,
+            int page,
+            int size,
+            String sortBy,
+            Sort.Direction direction) {
+
+        keyword = keyword.trim();
+
         if (keyword.isEmpty()) {
             throw new InvalidRequestException("keyword is empty");
         }
-        Page<Post> allPosts= postRepo.searchPosts(keyword,pageable);
-        return allPosts.map(postMapper::toResponse);
+
+        validateSortField(sortBy);
+
+        Pageable pageable =
+                PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+        Page<Post> posts = postRepo.searchPosts(keyword, pageable);
+
+        return posts.map(postMapper::toResponse);
     }
+
     private void validateSortField(String sortBy) {
         if (!ALLOWED_SORT_FIELDS.contains(sortBy)) {
             throw new InvalidRequestException("Invalid sort field");

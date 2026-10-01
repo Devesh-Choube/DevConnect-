@@ -24,7 +24,7 @@ public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     @Bean
-    public SecurityFilterChain SecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(customizer -> customizer.disable());
         http.authorizeHttpRequests(authorizeRequests -> authorizeRequests.requestMatchers("/auth/register","/auth/login", "/swagger-ui/**",
                 "/swagger-ui.html",
