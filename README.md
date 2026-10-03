@@ -1,12 +1,12 @@
-
 # DevConnect
+
 ![Java](https://img.shields.io/badge/Java-21-orange)
 ![Spring Boot](https://img.shields.io/badge/Spring_Boot-4.x-brightgreen)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Database-blue)
 ![JWT](https://img.shields.io/badge/Auth-JWT-red)
 ![License](https://img.shields.io/badge/License-MIT-green)
 
-A developer community platform where users can share knowledge, ask questions, and collaborate through posts and discussions.
+A developer community platform where developers can share knowledge, ask questions, discuss technical topics, and interact through posts, comments, voting, and following.
 
 ## Project Status
 
@@ -16,48 +16,47 @@ A developer community platform where users can share knowledge, ask questions, a
 
 ## About the Project
 
-DevConnect is a backend application inspired by developer communities like Stack Overflow and Reddit. It provides secure REST APIs for user authentication, creating posts, managing discussions through nested comments, and community-driven voting. 
-The application follows a layered architecture consisting of Controller, Service, Repository, DTO, Mapper, and Entity layers to promote maintainability and separation of concerns.
+DevConnect is a backend application inspired by developer communities like Stack Overflow and Reddit. It provides secure REST APIs that allow developers to create and manage posts, participate in discussions through nested comments, vote on posts and comments, create user profiles, and follow other developers.
 
-
+The application is built using a layered architecture consisting of Controller, Service, Repository, DTO, Mapper, and Entity layers to maintain separation of concerns, improve maintainability, and keep the codebase organized.
 ## Features
-
 
 ### Authentication
 - User Registration
 - Secure Login
-- JWT Token Generation
+- JWT Authentication
 
 ### Posts
-- Create Posts
-- Edit Posts
-- Delete Posts
+- Create, Edit & Delete Posts
 - Search Posts
-- Pagination
-- Sorting
+- Pagination & Sorting
 
 ### Comments
 - Nested Comments
-- Edit Comments
-- Delete Comments
+- Edit & Delete Comments
+- Comment Replies
 
 ### Community
 - Upvote/Downvote Posts
 - Upvote/Downvote Comments
+- Follow/Unfollow Developers
+- Followers & Following
+
+### User Profiles
+- View & Update Profiles
+- GitHub & LinkedIn Profiles
+- Soft Account Deletion
 
 ### Developer Experience
-- Swagger Documentation
-- Request Validation (Jakarta Validation)
+- Swagger/OpenAPI Documentation
+- Request Validation
 - Global Exception Handling
 
-
 ### Security
-- JWT-based authentication
-- Stateless session management
-- Password hashing with BCrypt
-- Protected endpoints using Spring Security
-
-
+- JWT-based Authentication
+- Stateless Session Management
+- BCrypt Password Hashing
+- Protected REST Endpoints
 ## Tech Stack
 
 | Category | Technology |
@@ -187,13 +186,13 @@ Bearer <your-token>
 8. You can now access all protected endpoints.
 ## Database Design
 
-
 ```mermaid
 erDiagram
     USER ||--o{ POST : creates
     USER ||--o{ COMMENT : writes
     USER ||--o{ POST_VOTE : casts
     USER ||--o{ COMMENT_VOTE : casts
+    USER ||--o{ FOLLOW : follows
 
     POST ||--o{ COMMENT : contains
     POST ||--o{ POST_VOTE : receives
@@ -202,7 +201,6 @@ erDiagram
     COMMENT ||--o{ COMMENT : replies_to
 ```
 ## API Reference
-
 
 ### Authentication
 
@@ -215,9 +213,9 @@ erDiagram
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/posts?page=0&size=10&sortBy=createdAt&direction=DESC` | Retrieve paginated posts |
-| GET | `/posts/{postId}` | Retrieve a post by ID |
-| POST | `/posts` | Create a new post |
+| GET | `/posts?page=0&size=10` | Retrieve paginated posts |
+| GET | `/posts/{postId}` | Retrieve a post |
+| POST | `/posts` | Create a post |
 | PUT | `/posts/{postId}` | Update a post |
 | DELETE | `/posts/{postId}` | Delete a post |
 | PUT | `/posts/{postId}/vote` | Vote on a post |
@@ -227,21 +225,41 @@ erDiagram
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/posts/{postId}/comments?page=0&size=10` | Retrieve paginated comments for a post |
+| GET | `/posts/{postId}/comments?page=0&size=10` | Retrieve paginated comments |
 | GET | `/posts/{postId}/comments/{commentId}` | Retrieve a comment |
 | POST | `/posts/{postId}/comments` | Add a comment |
 | PUT | `/posts/{postId}/comments/{commentId}` | Update a comment |
 | DELETE | `/posts/{postId}/comments/{commentId}` | Delete a comment |
 | PUT | `/posts/{postId}/comments/{commentId}/vote` | Vote on a comment |
-## Roadmap
 
+### User Profiles
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/users/me` | Retrieve my profile |
+| PATCH | `/users/me` | Update my profile |
+| GET | `/users/{username}` | Retrieve a user's profile |
+| DELETE | `/users/me` | Delete my account |
+
+### Follow
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| POST | `/users/{username}/follow` | Follow a user |
+| DELETE | `/users/{username}/follow` | Unfollow a user |
+| GET | `/users/{username}/followers` | Retrieve followers |
+| GET | `/users/{username}/following` | Retrieve following |
+| GET | `/users/{username}/follower/count` | Get follower count |
+| GET | `/users/{username}/following/count` | Get following count |
+## Roadmap
 
 - [x] JWT Authentication
 - [x] CRUD Posts
 - [x] Nested Comments
 - [x] Voting System
+- [x] User Profiles
+- [x] Follow System
 - [x] Swagger Documentation
-- [ ] User Profiles
 - [ ] Image Upload
 - [ ] Docker
 - [ ] AWS Deployment
