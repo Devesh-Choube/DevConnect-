@@ -3,11 +3,10 @@ package com.DevConnect.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -22,13 +21,26 @@ public class User {
     private String password;
     @Column(nullable = false, unique = true)
     private String email;
+
+    @Column(nullable = false)
+    private boolean deleted = false;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userId;
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts= new ArrayList<>();
-    @OneToMany(mappedBy = "user",cascade =CascadeType.ALL,orphanRemoval = true)
-    private List<Comment> comments=new ArrayList<>();
+    private String bio;
+    private String profileImageUrl;
+    private String githubUrl;
+    private String linkedinUrl;
+    @CreationTimestamp
+    private LocalDateTime joinedAt;
+
+
+    @OneToMany(mappedBy = "user")
+    private List<Post> posts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    private List<Comment> comments = new ArrayList<>();
+
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)
     private Set<CommentVote> commentVotes=new HashSet<>();
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL,orphanRemoval = true)

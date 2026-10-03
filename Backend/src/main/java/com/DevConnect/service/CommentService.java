@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
@@ -35,10 +36,9 @@ public class CommentService {
             "updatedAt"
     );
 
+    @Transactional
     public CommentResponse addComment(CreateCommentRequest createCommentRequest, Integer postId){
         Comment comment = commentMapper.toEntity(createCommentRequest);
-        comment.setCreatedAt(LocalDateTime.now());
-        comment.setUpdatedAt(LocalDateTime.now());
         User user =currentUserService.getCurrentUser();
         comment.setUser(user);
 
@@ -49,8 +49,6 @@ public class CommentService {
                 throw new InvalidRequestException("Parent comment belongs to another post");
             }
             comment.setParentComment(commentParentComment);
-
-
         }
         comment.setPost(post);
        Comment saved= commentRepo.save(comment);
@@ -58,6 +56,7 @@ public class CommentService {
 
     }
 
+    @Transactional
     public CommentResponse editComment(UpdateCommentRequest updateCommentRequest, Integer postId, Integer commentId) {
         Comment comment = commentRepo.findById(commentId).orElseThrow(()->new EntityNotFoundException("Comment not found"));
 
@@ -68,12 +67,12 @@ public class CommentService {
 
         commentMapper.updateEntity(updateCommentRequest,  comment);
 
-        comment.setUpdatedAt(LocalDateTime.now());
         Comment saved=commentRepo.save(comment);
         return commentMapper.toResponse(saved);
 
     }
 
+    @Transactional
     public String deleteComment(Integer postId, Integer commentId) {
         Comment comment = commentRepo.findById(commentId).orElseThrow(()->new EntityNotFoundException("Comment not found"));
         if(!(comment.getPost().getPostId().equals(postId))) {
@@ -92,6 +91,7 @@ public class CommentService {
         return commentMapper.toResponse(comment);
     }
 
+    @Transactional
     public String voteComment(Integer postId, Integer commentId, VoteRequest voteRequest) {
        Comment comment =commentRepo.findById(commentId).orElseThrow(()->new EntityNotFoundException("Comment not found"));
 

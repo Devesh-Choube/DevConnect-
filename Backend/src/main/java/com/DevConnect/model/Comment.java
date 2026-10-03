@@ -29,16 +29,16 @@ public class Comment {
 
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name="post_id")
+    @JoinColumn(name="post_id",nullable = false)
     private Post post;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_comment_id")
-    Comment parentComment;
+    private Comment parentComment;
 
     @OneToMany(mappedBy = "parentComment",cascade = CascadeType.ALL,orphanRemoval = true)
     private List<Comment> replies=new ArrayList<>();
